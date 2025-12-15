@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.pokemon.databinding.ActivitySearchBinding;
@@ -36,7 +37,6 @@ public class SearchFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.loadMyTeam(currentUser);
 
-
         if (viewModel.getWildPokemon().getValue() == null) {
             viewModel.searchEnemy();
         }
@@ -45,14 +45,23 @@ public class SearchFragment extends Fragment {
             if (pokemon != null) {
                 binding.tvWildName.setText(pokemon.getName());
                 binding.tvWildPower.setText("Poder: " + pokemon.getStats().get(0).getBaseStat());
-                Glide.with(this).load(pokemon.getSprites().getFrontDefault()).into(binding.ivWildImage);
+                if (getContext() != null) {
+                    Glide.with(this).load(pokemon.getSprites().getFrontDefault()).into(binding.ivWildImage);
+                }
                 binding.btnCapture.setEnabled(true);
             }
         });
 
-        viewModel.getMessage().observe(getViewLifecycleOwner(), msg ->
-                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show()
-        );
+        viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+
+            // Lógica para bloquear la pantalla si no hay internet
+            if (msg.contains("Error") || msg.contains("Internet")) {
+                binding.tvWildName.setText("Sin conexión");
+                binding.tvWildPower.setText("");
+                binding.btnCapture.setEnabled(false);
+            }
+        });
 
         //Volver atras
         binding.btnBack.setOnClickListener(v -> {
@@ -60,5 +69,11 @@ public class SearchFragment extends Fragment {
             androidx.navigation.Navigation.findNavController(view).popBackStack();
         });
         binding.btnCapture.setOnClickListener(v -> viewModel.tryCapture(currentUser));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
