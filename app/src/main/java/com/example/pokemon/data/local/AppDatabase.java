@@ -28,8 +28,11 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    AppDatabase.class, "pokedam_database") // Nombre del archivo de la BD
-                            .fallbackToDestructiveMigration() // Si cambias la BD, borra la anterior para no fallar
+                                    AppDatabase.class, "pokemon_database")
+
+
+                            .fallbackToDestructiveMigration()
+
                             .build();
                 }
             }

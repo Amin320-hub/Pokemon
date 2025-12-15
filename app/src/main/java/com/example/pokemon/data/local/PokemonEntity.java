@@ -6,11 +6,17 @@ import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
 
 // Definimos la tabla y la relacionamos con UserEntity (Si se borra el usuario, se borran sus pokemons)
-@Entity(tableName = "pokemons",
-        foreignKeys = @ForeignKey(entity = UserEntity.class,
+@Entity(
+        tableName = "pokemons",
+        foreignKeys = @androidx.room.ForeignKey(
+                entity = UserEntity.class,
                 parentColumns = "username",
                 childColumns = "ownerId",
-                onDelete = ForeignKey.CASCADE))
+               //en cascasda si se borra el usuario, se borran sus pokemons
+                onDelete = androidx.room.ForeignKey.CASCADE
+        ),
+        indices = {@androidx.room.Index(value = "ownerId")}
+)
 public class PokemonEntity {
 
     @PrimaryKey(autoGenerate = true)
